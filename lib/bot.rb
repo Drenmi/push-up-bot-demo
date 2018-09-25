@@ -7,6 +7,12 @@ class Bot < SlackRubyBot::Bot
   PUSH_UP_COUNT = /^\s*(?<count>\d+)!\s*$/
 
   match PUSH_UP_COUNT do |client, data, match|
-    client.say(channel: data.channel, text: "Well done! #{match[:count]} is not bad.")
+    count = match[:count].to_i
+
+    PushUpRecord.create(user: data.user, count: count)
+
+    total = PushUpRecord.sum(:count)
+
+    client.say(channel: data.channel, text: "Well done! The team has done #{total} push ups.")
   end
 end
